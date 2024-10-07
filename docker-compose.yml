@@ -1,28 +1,22 @@
 services:
-      umami:
-                container_name: umami
-                          image: ghcr.io/umami-software/umami:postgresql-latest
-                                    ports:
-                                                  - "3000:3000"
+  umami:
+    container_name: umami
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
 
-                                                            # use expose if you use my nginx setup (link in conclusion)
-                                                            #         # expose:
-                                                            #                 #     - "3000"
-                                                            #                         environment:
-                                                            #                                     DATABASE_URL: postgresql://umami:umami123@umami-db:5432/umami
-                                                            #                                                 DATABASE_TYPE: postgresql
-                                                            #                                                             HASH_SALT: <random-string>
-                                                            #                                                                     depends_on:
-                                                            #                                                                                 - umami-db
-                                                            #                                                                                         restart: always
-                                                            #
-                                                            #                                                                                             umami-db:
-                                                            #                                                                                                     container_name: umami-db
-                                                            #                                                                                                             image: postgres:12-alpine
-                                                            #                                                                                                                     environment:
-                                                            #                                                                                                                                 POSTGRES_DB: umami
-                                                            #                                                                                                                                             POSTGRES_USER: umami
-                                                            #                                                                                                                                                         POSTGRES_PASSWORD: umami123
-                                                            #                                                                                                                                                                 volumes:
-                                                            #                                                                                                                                                                             - ./umami/data:/var/lib/postgresql/data
-                                                            #                                                                                                                                                                                     restart: always
+  postgres:
+    deploy:
+      replicas: 1
+    image: postgres:16
+    ports:
+      - "0.0.0.0:${DATABASE_PORT}:5432"
+    volumes:
+      - "$HOME/umami/data:/var/lib/postgresql/data"
+      - "${APP_DIR}/docker/postgresql.conf:/var/lib/postgresql/data/postgresql.conf"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
