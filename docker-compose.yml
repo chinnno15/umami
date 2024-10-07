@@ -1,12 +1,4 @@
 services:
-  umami:
-    container_name: umami
-    image: ghcr.io/umami-software/umami:postgresql-latest
-    ports:
-      - "3010:3000"
-    env_file:
-      - .env.production
-
   postgres:
     deploy:
       replicas: 1
@@ -15,8 +7,6 @@ services:
       - "0.0.0.0:${DATABASE_PORT}:5432"
     volumes:
       - "$HOME/umami/data:/var/lib/postgresql/data"
-        # - "${APP_DIR}/docker/postgresql.conf:/var/lib/postgresql/data/postgresql.conf"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - "${APP_DIR}/docker/postgresql.conf:/var/lib/postgresql/data/postgresql.conf"
+    env_file:
+      - .env.production
